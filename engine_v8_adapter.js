@@ -1,0 +1,565 @@
+/**
+ * SOVEREIGN v7.5 "winsestar.lol" - ADAPTED ENGINE
+ * @author: Antigravity / winse
+ */
+
+"use strict";
+
+(function () {
+    // --- CINEMATIC TRANSITION SYSTEM v8.0 ---
+    // --- CRITICAL VISIBILITY & TRANSITION SYSTEM v8.6 ---
+    // This system ensures the site NEVER stays black, even if scripts fail.
+
+    window.animatePageOut = function (url) {
+        const overlay = document.createElement('div');
+        overlay.className = 'transition-glitch-overlay glitch-flash-active';
+        document.body.appendChild(overlay);
+        document.body.classList.add('page-exit');
+        setTimeout(() => { window.location.href = url; }, 800);
+    };
+
+    window.animatePageIn = function () {
+        // IMMEDIATE CHECK FOR BOTS / CRAWLERS
+        const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+        if (isBot) {
+            forceShowPage();
+            return;
+        }
+
+        // Initial state: hide flash overlay if it exists
+        const overlays = document.querySelectorAll('.transition-glitch-overlay');
+        overlays.forEach(o => o.remove());
+
+        // Entrance animation
+        document.body.classList.add('page-enter');
+
+        // Force opacity and remove enter class in the next frame
+        requestAnimationFrame(() => {
+            document.body.classList.remove('page-enter');
+            document.body.style.opacity = '1';
+            document.body.style.visibility = 'visible';
+        });
+
+        // Entrance flash
+        const flash = document.createElement('div');
+        flash.className = 'transition-glitch-overlay glitch-flash-active';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 600);
+    };
+
+    function forceShowPage() {
+        document.body.classList.remove('page-enter', 'page-exit');
+        document.body.style.opacity = '1';
+        document.body.style.visibility = 'visible';
+        document.body.style.display = 'grid';
+        const overlays = document.querySelectorAll('.transition-glitch-overlay');
+        overlays.forEach(o => o.remove());
+        console.log("Visibility Fail-safe Triggered.");
+    }
+
+    // Immediate execution
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        window.animatePageIn();
+    } else {
+        document.addEventListener('DOMContentLoaded', window.animatePageIn);
+    }
+
+    // Hard fail-safes (Tightened for Google Crawler)
+    setTimeout(forceShowPage, 600);
+    window.addEventListener('load', forceShowPage);
+
+    // Global Navigation Interceptor
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.getAttribute('href')) {
+            const url = link.getAttribute('href');
+            if (url && url !== '#' && !url.startsWith('http') && !url.startsWith('mailto')) {
+                e.preventDefault();
+                window.animatePageOut(url);
+                return;
+            }
+        }
+        const infoBtn = e.target.closest('#infoBtn');
+        if (infoBtn) {
+            e.preventDefault();
+            window.animatePageOut('info.html');
+            return;
+        }
+    });
+
+    function init() {
+        // EMERGENCY VISIBILITY (Prevents black screen in Chrome/Opera)
+        forceShowPage();
+
+        try {
+            if (!window.S_PROFILE_DATA) {
+                window.S_PROFILE_DATA = {
+                    username: "winsestar",
+                    full_name: "WINSE",
+                    config: {
+                        links: { discord: "1039582785687531582" },
+                        features: { badges: [], typewriter: true }
+                    }
+                };
+            }
+
+            const profile = window.S_PROFILE_DATA;
+            const config = profile.config || {};
+
+            window.sState = {
+                discordId: '1039582785687531582',
+                siteTitle: profile.full_name || profile.username,
+                bio: profile.bio || '',
+                colors: config.colors || {},
+                effects: config.effects || {},
+                media: config.media || { bgMode: 'stars' },
+                discord: config.discord || { sync: true },
+                links: config.links || {},
+                features: config.features || { badges: ['imperial-star'], typewriter: true, viewCounter: true }
+            };
+
+            if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+                incrementGlobalViews();
+            }
+            bootSovereign();
+        } catch (err) {
+            console.error("Init Error:", err);
+            forceShowPage();
+        }
+    }
+
+    async function incrementGlobalViews() {
+        try {
+            const res = await fetch('https://api.counterapi.dev/v1/winsestar_v12/profile/up');
+            const data = await res.json();
+            let count = (data.count || 0);
+            const viewEl = document.getElementById('profileVersion');
+            if (viewEl) {
+                const lang = localStorage.getItem('winsestar_lang') || 'tr';
+                const label = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) ? window.TRANSLATIONS[lang].views : 'Görüntülenme';
+                viewEl.innerHTML = `<i class="fa-solid fa-eye" style="margin-right: 5px;"></i> <span id="viewCountText">${Number(count).toLocaleString()} ${label}</span>`;
+            }
+        } catch (e) { }
+    }
+
+    function bootSovereign() {
+        try {
+            applySovereignState(window.sState);
+            setupStaticTilt();
+            preloadAvatar();
+            fetchTelemetry();
+            setInterval(fetchTelemetry, 6000);
+            setInterval(spawnShootingStar, 4000);
+            setTimeout(forceShowPage, 100); // Success override
+        } catch (e) {
+            console.error("Boot Error:", e);
+            forceShowPage();
+        }
+    }
+
+    // --- SHOOTING STARS ENGINE v8.5 ---
+    function spawnShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        star.style.left = Math.random() * window.innerWidth + 'px';
+        star.style.top = Math.random() * window.innerHeight * 0.5 + 'px';
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 3000);
+    }
+
+    // --- REUSED CORE LOGIC FROM engine_v8.js ---
+    function applySovereignState(s) {
+        const root = document.documentElement;
+        const c = s.colors || {};
+
+        // Apply CSS Variables
+        if (c.name) {
+            root.style.setProperty('--text-start', c.name[0]);
+            root.style.setProperty('--text-end', c.name[1]);
+        }
+        if (c.border) {
+            root.style.setProperty('--border-start', c.border[0]);
+            root.style.setProperty('--border-end', c.border[1]);
+        }
+
+        const eff = s.effects || {};
+        const nameEl = document.getElementById('profileName');
+        const cardEl = document.getElementById('mainCard');
+
+        if (cardEl) {
+            cardEl.classList.toggle('float-animation', !!eff.floatCard);
+            cardEl.classList.toggle('glow-animation', !!eff.glowCard);
+        }
+
+        handleBgMatrix(s.media || { bgMode: 'stars' });
+        renderSocialIcons(s.links || {});
+        applyBadges(s.features?.badges || []);
+
+        if (s.features?.typewriter) {
+            const bioEl = document.getElementById('profileBio');
+            if (bioEl) bioEl.innerHTML = s.bio;
+        }
+    }
+
+    function handleBgMatrix(m) {
+        const atom = document.getElementById('particles-js');
+        if (!atom) return;
+
+        if (window.particlesJS) {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: window.innerWidth < 768 ? 30 : 60 },
+                    color: { value: m.atomColor || '#ffffff' },
+                    opacity: { value: 0.3 },
+                    size: { value: 1 },
+                    line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.1, width: 1 },
+                    move: { enable: true, speed: 1 }
+                }
+            });
+        }
+    }
+
+    function renderSocialIcons(links) {
+        const grid = document.getElementById('socialLinks');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const icons = { discord: 'fa-discord', tiktok: 'fa-tiktok', instagram: 'fa-instagram', github: 'fa-github', youtube: 'fa-youtube', steam: 'fa-steam', spotify: 'fa-spotify', twitter: 'fa-x-twitter', telegram: 'fa-telegram' };
+        Object.keys(icons).forEach(k => {
+            if (links[k]) {
+                grid.innerHTML += `<a href="${links[k]}" target="_blank" class="social-item">
+                    <i class="fa-brands ${icons[k]}"></i>
+                </a>`;
+            }
+        });
+    }
+
+    function setupStaticTilt() {
+        const card = document.getElementById('cardTilt');
+        if (!card) return;
+
+        let isTilting = false;
+        window.addEventListener('mousemove', e => {
+            if (!isTilting) {
+                isTilting = true;
+                requestAnimationFrame(() => {
+                    const r = card.getBoundingClientRect();
+                    const centerX = r.left + r.width / 2;
+                    const centerY = r.top + r.height / 2;
+                    const rx = ((e.clientY - centerY) / (window.innerHeight / 2)) * -5;
+                    const ry = ((e.clientX - centerX) / (window.innerWidth / 2)) * 5;
+                    card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale3d(1.02,1.02,1.02)`;
+                    isTilting = false;
+                });
+            }
+        }, { passive: true });
+    }
+
+    async function fetchTelemetry() {
+        const dId = window.sState.discordId;
+        if (!dId) return;
+        try {
+            const r = await fetch('https://api.lanyard.rest/v1/users/' + dId);
+            const { data } = await r.json();
+            if (data) renderTelemetry(data);
+        } catch (e) { }
+    }
+
+    function getAssetUrl(appId, assetId) {
+        if (!assetId) return `https://dcdn.dstn.to/app-icons/${appId}`;
+        if (assetId.startsWith('mp:external/')) {
+            return 'https://media.discordapp.net/external/' + assetId.replace('mp:external/', '');
+        }
+        return `https://cdn.discordapp.com/app-assets/${appId}/${assetId}.png`;
+    }
+
+    function renderTelemetry(data) {
+        // Dynamic Discord Avatar, Banner & Name Sync
+        if (data.discord_user) {
+            const u = data.discord_user;
+            
+            // 0. Name, Gradient & Username Sync
+            const nameEl = document.getElementById('profileName');
+            if (nameEl) {
+                const displayName = u.global_name || u.username || "'winse";
+                nameEl.innerText = displayName;
+                nameEl.setAttribute('data-text', displayName);
+                
+                if (u.display_name_styles && u.display_name_styles.colors && u.display_name_styles.colors.length) {
+                    const c1 = '#' + u.display_name_styles.colors[0].toString(16).padStart(6, '0');
+                    const c2 = '#' + (u.display_name_styles.colors[1] || u.display_name_styles.colors[0]).toString(16).padStart(6, '0');
+                    nameEl.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+                    nameEl.style.webkitBackgroundClip = 'text';
+                    nameEl.style.webkitTextFillColor = 'transparent';
+                } else {
+                    nameEl.style.background = `linear-gradient(135deg, #d5c0a2, #dcdddc)`;
+                    nameEl.style.webkitBackgroundClip = 'text';
+                    nameEl.style.webkitTextFillColor = 'transparent';
+                }
+            }
+            
+            const userEl = document.getElementById('profileUsername');
+            if (userEl && u.username) {
+                userEl.innerText = `@${u.username}`;
+            }
+
+            // 0b. Clan / Guild Tag Sync
+            const clanObj = u.clan || u.primary_guild;
+            const clanContainer = document.getElementById('clanBadgeContainer');
+            if (clanObj && clanObj.tag) {
+                if (clanContainer) {
+                    clanContainer.style.display = 'inline-flex';
+                    const tagText = document.getElementById('clanTagText');
+                    if (tagText) tagText.innerText = clanObj.tag;
+                    
+                    const badgeImg = document.getElementById('clanBadgeImg');
+                    if (badgeImg && clanObj.badge && clanObj.identity_guild_id) {
+                        badgeImg.src = `https://cdn.discordapp.com/clan-badges/${clanObj.identity_guild_id}/${clanObj.badge}.png`;
+                        badgeImg.style.display = 'inline-block';
+                    }
+                }
+            }
+
+            // 1. Avatar & Decoration Sync
+            if (u.avatar) {
+                const ext = u.avatar.startsWith('a_') ? 'gif' : 'png';
+                const avatarUrl = `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.${ext}?size=512`;
+                
+                const profileAvatar = document.getElementById('profileAvatar');
+                if (profileAvatar && profileAvatar.src !== avatarUrl) {
+                    profileAvatar.src = avatarUrl;
+                }
+                
+                const infoProfileImg = document.querySelector('.profile-img');
+                if (infoProfileImg && infoProfileImg.src !== avatarUrl) {
+                    infoProfileImg.src = avatarUrl;
+                }
+            }
+
+            const decorEl = document.getElementById('avatarDecoration');
+            if (u.avatar_decoration_data && u.avatar_decoration_data.asset) {
+                const decorUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${u.avatar_decoration_data.asset}.png`;
+                if (decorEl) {
+                    decorEl.src = decorUrl;
+                    decorEl.style.display = 'block';
+                }
+            } else if (decorEl) {
+                decorEl.style.display = 'none';
+            }
+
+            // 2. Banner Sync
+            if (u.banner) {
+                const ext = u.banner.startsWith('a_') ? 'gif' : 'png';
+                const bannerUrl = `https://cdn.discordapp.com/banners/${u.id}/${u.banner}.${ext}?size=1024`;
+                
+                const cardBanner = document.getElementById('cardBanner');
+                if (cardBanner) {
+                    cardBanner.style.backgroundImage = `url('${bannerUrl}')`;
+                    cardBanner.style.backgroundSize = 'cover';
+                    cardBanner.style.backgroundPosition = 'center';
+                }
+            } else if (u.banner_color) {
+                const cardBanner = document.getElementById('cardBanner');
+                if (cardBanner) {
+                    cardBanner.style.backgroundImage = 'none';
+                    cardBanner.style.backgroundColor = u.banner_color;
+                }
+            }
+        }
+
+        const statusEl = document.getElementById('discordStatus');
+        if (statusEl) {
+            const colors = { online: '#22c55e', idle: '#f59e0b', dnd: '#ef4444', offline: '#4b5563' };
+            statusEl.style.background = colors[data.discord_status] || colors.offline;
+        }
+
+        const prefsEl = document.getElementById('discordPrefs');
+        if (prefsEl) {
+            let html = '';
+
+            const customStatus = data.activities.find(a => a.type === 4);
+            if (customStatus) {
+                const emoji = customStatus.emoji?.id ? `<img src="https://cdn.discordapp.com/emojis/${customStatus.emoji.id}.${customStatus.emoji.animated ? 'gif' : 'png'}?size=32" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;">` : (customStatus.emoji?.name ? (customStatus.emoji.name + ' ') : '');
+                const text = customStatus.state || '';
+                html += `<div class="v8-pref-widget telemetry-card activity-card" style="border-left: 2px solid #ffffff;"><div class="pref-label" style="font-size: 0.7em; color: #fff; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;"><i class="fa-solid fa-comment-dots" style="margin-right: 4px;"></i> STATUS</div><div class="pref-val" style="font-size: 0.9em; font-weight: 500; color: #fff;">${emoji}${text}</div></div>`;
+            }
+
+            if (data.spotify) {
+                const cover = data.spotify.album_art_url || '';
+                html += `<div class="v8-pref-widget telemetry-card spotify-card">
+                            <img src="${cover}" class="ss-album-art">
+                            <div class="ss-info">
+                                <div class="ss-listening-tag"><i class="fa-brands fa-spotify"></i> LISTENING</div>
+                                <div class="ss-title-wrap"><span class="ss-title ss-target-title">${data.spotify.song}</span></div>
+                                <div class="ss-artist-wrap"><span class="ss-artist ss-target-artist">by ${data.spotify.artist}</span></div>
+                            </div>
+                        </div>`;
+            }
+
+            data.activities.filter(a => a.type === 0).forEach(game => {
+                const imgUrl = game.application_id ? getAssetUrl(game.application_id, game.assets?.large_image) : 'logo.png?v=2';
+                html += `<div class="v8-pref-widget telemetry-card activity-card">
+                            <img src="${imgUrl}" class="ss-game-art">
+                            <div class="ss-info">
+                                <div class="ss-playing-tag"><i class="fa-solid fa-gamepad"></i> PLAYING</div>
+                                <div class="ss-title-wrap"><span class="ss-title ss-target-title">${game.name}</span></div>
+                                <div class="ss-artist-wrap"><span class="ss-artist ss-target-artist">${game.details || ''}</span></div>
+                            </div>
+                        </div>`;
+            });
+
+            if (!html) {
+                html = `<div class="v8-pref-widget" style="padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; text-align: center; border: 1px dashed rgba(255,255,255,0.3);"><div class="pref-label" style="font-size: 0.7em; color: rgba(255,255,255,0.7); margin-bottom: 4px; text-transform: uppercase;"><i class="fa-solid fa-satellite-dish" style="margin-right: 4px;"></i> DISCORD TELEMETRY</div><div class="pref-val"><span style="color: rgba(255,255,255,0.6); font-size: 0.85em;">Offline or Idle</span></div></div>`;
+            }
+
+            if (html !== prefsEl.innerHTML) {
+                prefsEl.style.transition = "opacity 0.5s var(--ease-v7), transform 0.5s var(--ease-v7), filter 0.5s var(--ease-v7)";
+                prefsEl.style.opacity = "0";
+                prefsEl.style.transform = "translateY(30px) scale(0.85)";
+                prefsEl.style.filter = "blur(10px) brightness(2)";
+
+                setTimeout(() => {
+                    prefsEl.innerHTML = html;
+                    prefsEl.classList.add('v8-bloom'); // Flash effect
+
+                    prefsEl.style.opacity = "1";
+                    prefsEl.style.transform = "translateY(0) scale(1)";
+                    prefsEl.style.filter = "blur(0px) brightness(1)";
+
+                    // Re-apply Marquee after injection
+                    const targets = prefsEl.querySelectorAll('.ss-target-title, .ss-target-artist');
+                    targets.forEach(t => handleMarquee(t));
+
+                    setTimeout(() => prefsEl.classList.remove('v8-bloom'), 600);
+                }, 500);
+            }
+        }
+
+        // Sync 3D Side Decorations
+        sync3DDecor(data);
+
+        // EXTRA: Dynamic Theme Sync
+        if (data.spotify) {
+            const artUrl = data.spotify.album_art_url;
+            if (window.lastProcessedArt !== artUrl) {
+                window.lastProcessedArt = artUrl;
+                extractColorsFromImage(artUrl).then(color => {
+                    applyDynamicTheme(color);
+                });
+            }
+        } else {
+            if (window.lastProcessedArt !== null) {
+                window.lastProcessedArt = null;
+                applyDynamicTheme(null);
+            }
+        }
+
+        // Apply Marquee to internal card targets
+        setTimeout(() => {
+            const targets = document.querySelectorAll('.ss-target-title, .ss-target-artist');
+            targets.forEach(t => handleMarquee(t));
+        }, 100);
+    }
+
+    async function extractColorsFromImage(url) {
+        if (!url || !window.ColorThief) return null;
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                try {
+                    const colorThief = new ColorThief();
+                    const rgb = colorThief.getColor(img);
+                    resolve(`rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`);
+                } catch (e) { resolve(null); }
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
+
+    function applyDynamicTheme(color) {
+        const root = document.documentElement;
+        if (color) {
+            root.style.setProperty('--accent-primary', color);
+            root.style.setProperty('--accent-glow', color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+            root.style.setProperty('--border-start', color);
+
+            // Apply to 3D text specifically if needed (handled by CSS var now)
+        } else {
+            // Reset to defaults
+            root.style.setProperty('--accent-primary', '#ffffff');
+            root.style.setProperty('--accent-glow', 'rgba(255, 255, 255, 0.4)');
+            root.style.setProperty('--border-start', '#ffffff');
+        }
+    }
+
+    function sync3DDecor(data) {
+        const coverEl = document.getElementById('decorCover');
+        const decorWrap = document.getElementById('decorLeft');
+        if (!coverEl || !decorWrap) return;
+
+        const newSrc = data.spotify ? (data.spotify.album_art_url || 'logo.png?v=2') : 'logo.png?v=2';
+
+        // Only trigger transition if the source actually changes
+        if (!coverEl.src.includes(newSrc)) {
+            coverEl.style.transition = "opacity 0.6s var(--ease-v7), filter 0.6s var(--ease-v7), transform 0.6s var(--ease-v7)";
+            coverEl.style.opacity = "0";
+            coverEl.style.transform = "scale(0.7) rotateY(45deg) translateZ(-100px)"; // Prominent 3D jump
+            coverEl.style.filter = "blur(20px) brightness(2)";
+
+            setTimeout(() => {
+                coverEl.src = newSrc;
+                coverEl.onload = () => {
+                    coverEl.style.opacity = "1";
+                    coverEl.style.transform = "scale(1) rotateY(0deg) translateZ(0)";
+                    coverEl.style.filter = "blur(0px) brightness(1.1)";
+                };
+            }, 600);
+        }
+
+        if (data.spotify) {
+            decorWrap.style.opacity = "0.8";
+            decorWrap.style.filter = "saturate(1.2) contrast(1.1) brightness(1.1)";
+        } else {
+            decorWrap.style.opacity = "0.4";
+            decorWrap.style.filter = "saturate(0.9) contrast(1.0)";
+        }
+    }
+
+    function handleMarquee(el) {
+        if (!el) return;
+        el.classList.remove('ss-marquee');
+
+        // Let the DOM settle, then check for actual overflow
+        setTimeout(() => {
+            const container = el.parentElement;
+            // Case: If text is wider than its container, start scrolling
+            if (el.scrollWidth > container.offsetWidth) {
+                el.classList.add('ss-marquee');
+
+                // Double the content internally to create a seamless loop
+                if (!el.innerHTML.includes('</span><span')) {
+                    const original = el.innerText;
+                    el.innerHTML = `<span>${original}</span><span style="padding-left: 50px;">${original}</span>`;
+                }
+            }
+        }, 300); // Increased delay for better measurement on initial render
+    }
+
+    function applyBadges(badges) {
+        const wrap = document.getElementById('badgeContainer');
+        if (!wrap || !badges.length) return;
+        wrap.classList.remove('hidden');
+        wrap.innerHTML = badges.map(b => `<div class="badge-item"><i class="fa-solid fa-certificate"></i></div>`).join('');
+    }
+
+    function preloadAvatar() { }
+
+    // Start initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
