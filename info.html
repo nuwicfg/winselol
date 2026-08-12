@@ -218,6 +218,18 @@
       transition: transform 0.3s ease;
     }
 
+    .avatar-decoration-v7 {
+      position: absolute;
+      top: -12%;
+      left: -12%;
+      width: 124%;
+      height: 124%;
+      pointer-events: none;
+      transform: translateZ(60px) !important;
+      z-index: 999 !important;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+    }
+
     /* Typography */
     .text-content {
       display: flex;
@@ -379,7 +391,7 @@
       <div class="image-card" data-tilt data-tilt-max="20" data-tilt-speed="400" data-tilt-glare="true"
         data-tilt-max-glare="0.3" style="position: relative;">
         <img src="profil.gif" alt="Profil" class="profile-img">
-        <img id="avatarDecoration" class="avatar-decoration-v7" src="https://cdn.discordapp.com/avatar-decoration-presets/a_6d16b27d9415cafe3b289053644337c4.png" style="position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; pointer-events: none; z-index: 15;" alt="Decoration">
+        <img id="avatarDecoration" class="avatar-decoration-v7" src="https://cdn.discordapp.com/avatar-decoration-presets/a_6d16b27d9415cafe3b289053644337c4.png" alt="Decoration">
       </div>
 
       <!-- RIGHT TEXT CONTENT -->

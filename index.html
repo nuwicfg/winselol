@@ -27,7 +27,7 @@
   <link rel="icon" type="image/png" href="logo.png?v=2">
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntika&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Grenze+Gotisch:wght@600;700&family=UnifrakturMaguntika&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- FontAwesome for the UI icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,7 +43,7 @@
       "full_name": "'winse",
       "avatar_url": "profil.gif",
       "banner_url": "banner.png",
-      "bio": "<span class=\"blink-text\" style=\"color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);\">GÖZLERİN BENİ BİTİRDİ</span> <span style=\"color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);\"><i class=\"fa-solid fa-eye\"></i></span>",
+      "bio": "Abim: <strong>'Mr</strong> 🤍",
       "config": {
         "badges": [
           { "icon": "<i class=\"fa-solid fa-crown\" style=\"color: #ffffff;\"></i>", "tooltip": "Emperor" },
@@ -210,7 +210,7 @@
       </div>
 
       <div class="profile-card-v7 gradient-border" id="mainCard"
-        style="border: 2px solid #ffffff; box-shadow: 0 0 25px rgba(255,255,255,0.2) inset, 0 0 35px rgba(255,255,255,0.3);">
+        style="border: 2px solid #ffffff; box-shadow: 0 0 25px rgba(255,255,255,0.2) inset, 0 0 35px rgba(255,255,255,0.3); overflow: hidden; border-radius: 28px;">
 
         <header class="card-header-v7">
           <div class="banner-area-v7" id="cardBanner"></div>
@@ -227,19 +227,22 @@
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
               <span id="profileUsername"
                 style="color: #ffffff; opacity: 0.9; font-weight: 500; font-family: 'Poppins'; text-shadow: 0 0 10px rgba(255,255,255,0.3);">@justwinsegod</span>
-              <div id="clanBadgeContainer" class="clan-tag-v7" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 10px; font-size: 0.8rem; font-weight: 700; color: #ffffff; letter-spacing: 1px; backdrop-filter: blur(10px);">
+              <div id="clanBadgeContainer" class="clan-tag-v7" onclick="window.open('https://discord.gg/offwhite', '_blank')" style="position: relative; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 10px; font-size: 0.8rem; font-weight: 700; color: #ffffff; letter-spacing: 1px; backdrop-filter: blur(10px); cursor: pointer;">
                 <img id="clanBadgeImg" src="https://cdn.discordapp.com/clan-badges/1276232135354880020/bb6f447245dd4c9243d2aeb61d26154d.png" style="width: 15px; height: 15px; object-fit: contain;">
                 <span id="clanTagText">Ø₣₣₩</span>
+                <div class="clan-popup-v7" onclick="event.stopPropagation()">
+                  <div class="clan-popup-url"><i class="fa-brands fa-discord" style="margin-right: 5px; color: #5865F2;"></i>https://discord.gg/offwhite</div>
+                  <a href="https://discord.gg/offwhite" target="_blank" class="clan-join-btn">Katıl <i class="fa-solid fa-arrow-right-to-bracket" style="font-size: 0.75rem;"></i></a>
+                </div>
+              </div>
+              <div class="star-badge-v7" title="justwinsegod" data-tooltip="justwinsegod">
+                <i class="fa-solid fa-star" style="color: #ffd700; font-size: 1rem; filter: drop-shadow(0 0 8px #ffd700);"></i>
               </div>
             </div>
-            <div id="badgeContainer" class="badges-v7 hidden"></div>
           </div>
 
           <div class="bio-area-v7">
-            <p id="profileBio"><span class="blink-text"
-                style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);">GÖZLERİN BENİ BİTİRDİ</span> <span
-                style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1); font-size: 1.2rem;"><i
-                  class="fa-solid fa-eye"></i></span></p>
+            <p id="profileBio" style="color: #ffffff; font-size: 1.05rem; font-weight: 500; letter-spacing: 0.5px;">Abim: <strong>'Mr</strong> 🤍</p>
           </div>
 
           <div id="presenceRoot" class="presence-container-v7 hidden"></div>
@@ -341,22 +344,22 @@
     window.TRANSLATIONS = {
       tr: {
         navHome: "ANA SAYFA", navInfo: "KİMDİR?", navSocial: "BAĞLANTILAR", navPortfolio: "EDİTLERİM",
-        bio: '<span class="blink-text" style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);">your eyes killed me.</span> <span style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);"><i class="fa-solid fa-eye"></i></span>',
+        bio: "Abim: <strong>'Mr</strong> 🤍",
         views: "Görüntülenme"
       },
       en: {
         navHome: "HOME", navInfo: "ABOUT", navSocial: "SOCIALS", navPortfolio: "EDITS",
-        bio: '<span class="blink-text" style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);">your eyes killed me.</span> <span style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);"><i class="fa-solid fa-eye"></i></span>',
+        bio: "Abim: <strong>'Mr</strong> 🤍",
         views: "Views"
       },
       de: {
         navHome: "START", navInfo: "ÜBER", navSocial: "LINKS", navPortfolio: "EDITS",
-        bio: '<span class="blink-text" style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);">your eyes killed me.</span> <span style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);"><i class="fa-solid fa-eye"></i></span>',
+        bio: "Abim: <strong>'Mr</strong> 🤍",
         views: "Aufrufe"
       },
       fr: {
         navHome: "ACCUEIL", navInfo: "À PROPOS", navSocial: "SOCIALS", navPortfolio: "EDITS",
-        bio: '<span class="blink-text" style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);">your eyes killed me.</span> <span style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,1);"><i class="fa-solid fa-eye"></i></span>',
+        bio: "Abim: <strong>'Mr</strong> 🤍",
         views: "Vues"
       }
     };

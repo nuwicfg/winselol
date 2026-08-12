@@ -129,17 +129,26 @@
     }
 
     async function incrementGlobalViews() {
+        const viewEl = document.getElementById('profileVersion');
+        let count = parseInt(localStorage.getItem('winsestar_views_count') || '12842', 10);
+        count += 1;
+        localStorage.setItem('winsestar_views_count', count.toString());
+
         try {
-            const res = await fetch('https://api.counterapi.dev/v1/winsestar_v12/profile/up');
-            const data = await res.json();
-            let count = (data.count || 0);
-            const viewEl = document.getElementById('profileVersion');
-            if (viewEl) {
-                const lang = localStorage.getItem('winsestar_lang') || 'tr';
-                const label = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) ? window.TRANSLATIONS[lang].views : 'Görüntülenme';
-                viewEl.innerHTML = `<i class="fa-solid fa-eye" style="margin-right: 5px;"></i> <span id="viewCountText">${Number(count).toLocaleString()} ${label}</span>`;
+            const res = await fetch('https://api.counterapi.dev/v1/winsestar_v15/profile/up', { mode: 'cors' });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && typeof data.count === 'number' && data.count > 0) {
+                    count = 12842 + data.count;
+                }
             }
         } catch (e) { }
+
+        if (viewEl) {
+            const lang = localStorage.getItem('winsestar_lang') || 'tr';
+            const label = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) ? window.TRANSLATIONS[lang].views : 'Görüntülenme';
+            viewEl.innerHTML = `<i class="fa-solid fa-eye" style="margin-right: 5px;"></i> <span id="viewCountText">${Number(count).toLocaleString()} ${label}</span>`;
+        }
     }
 
     function bootSovereign() {
@@ -480,17 +489,30 @@
 
     function applyDynamicTheme(color) {
         const root = document.documentElement;
+        const mainCard = document.getElementById('mainCard');
+
         if (color) {
+            const rgbaGlow = color.replace('rgb', 'rgba').replace(')', ', 0.5)');
+            const rgbaInset = color.replace('rgb', 'rgba').replace(')', ', 0.3)');
             root.style.setProperty('--accent-primary', color);
-            root.style.setProperty('--accent-glow', color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+            root.style.setProperty('--accent-glow', rgbaGlow);
             root.style.setProperty('--border-start', color);
 
-            // Apply to 3D text specifically if needed (handled by CSS var now)
+            if (mainCard) {
+                mainCard.style.transition = 'border-color 0.8s ease, box-shadow 0.8s ease';
+                mainCard.style.borderColor = color;
+                mainCard.style.boxShadow = `0 0 25px ${rgbaInset} inset, 0 0 35px ${rgbaGlow}, 0 0 60px ${rgbaGlow}`;
+            }
         } else {
-            // Reset to defaults
             root.style.setProperty('--accent-primary', '#ffffff');
             root.style.setProperty('--accent-glow', 'rgba(255, 255, 255, 0.4)');
             root.style.setProperty('--border-start', '#ffffff');
+
+            if (mainCard) {
+                mainCard.style.transition = 'border-color 0.8s ease, box-shadow 0.8s ease';
+                mainCard.style.borderColor = '#ffffff';
+                mainCard.style.boxShadow = '0 0 25px rgba(255,255,255,0.2) inset, 0 0 35px rgba(255,255,255,0.3)';
+            }
         }
     }
 
